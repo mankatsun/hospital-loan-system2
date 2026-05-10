@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import date
 import json
 import os
+from streamlit_drawable_canvas import st_canvas
 
 # 設定網頁標題和樣式
 st.set_page_config(
@@ -36,6 +37,7 @@ st.markdown("""
         border-radius: 10px;
         border-left: 4px solid #667eea;
         margin: 0.5rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .success-message {
         background: #d4edda;
@@ -43,6 +45,7 @@ st.markdown("""
         padding: 1rem;
         border-radius: 10px;
         font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .warning-message {
         background: #fff3cd;
@@ -50,6 +53,7 @@ st.markdown("""
         padding: 1rem;
         border-radius: 10px;
         font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .stButton>button {
         background: #667eea;
@@ -59,10 +63,50 @@ st.markdown("""
         border-radius: 5px;
         font-weight: bold;
         transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
     .stButton>button:hover {
         background: #5a67d8;
         transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .signature-section {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+        border: 2px dashed #667eea;
+        margin: 1rem 0;
+    }
+    .quick-return-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.3rem 1rem;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .quick-return-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    /* 改善文字陰影效果 */
+    h1, h2, h3, h4, h5, h6 {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .metric-card h3 {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        color: #333;
+    }
+    .form-section h2, .form-section h3 {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        color: #333;
+    }
+    .main-header h1 {
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -163,12 +207,40 @@ if choice == "📝 新增租借紀錄":
         st.markdown("*Borrow Dept. / Ward i/c*")
         st.markdown("*(簽名請用正楷)*")
         borrow_manager = st.text_input("Borrow Manager", placeholder="請輸入姓名")
+        
+        # 電子簽名 - 借用部門主管
+        st.markdown('<div class="signature-section">', unsafe_allow_html=True)
+        st.write("📝 **借用部門主管電子簽名：**")
+        st.write("請在此處簽名：")
+        borrow_signature = st_canvas(
+            fill_color="rgba(255, 165, 0, 0.3)",
+            stroke_width=2,
+            stroke_color="#000",
+            background_color="#fff",
+            height=150,
+            key="borrow_signature",
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
         st.markdown("**👤 借出部門主管**")
         st.markdown("*Loan Dept. / Ward i/c*")
         st.markdown("*(簽名請用正楷)*")
         loan_manager = st.text_input("Loan Manager", placeholder="請輸入姓名")
+        
+        # 電子簽名 - 借出部門主管
+        st.markdown('<div class="signature-section">', unsafe_allow_html=True)
+        st.write("📝 **借出部門主管電子簽名：**")
+        st.write("請在此處簽名：")
+        loan_signature = st_canvas(
+            fill_color="rgba(255, 165, 0, 0.3)",
+            stroke_width=2,
+            stroke_color="#000",
+            background_color="#fff",
+            height=150,
+            key="loan_signature",
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
     
     # 提交按鈕
     st.markdown("---")
@@ -189,7 +261,9 @@ if choice == "📝 新增租借紀錄":
                     "借用部門主管": borrow_manager,
                     "借出部門主管": loan_manager,
                     "狀態": "租借中",
-                    "建立時間": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
+                    "建立時間": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "借用部門簽名": borrow_signature.json_data if borrow_signature else None,
+                    "借出部門簽名": loan_signature.json_data if loan_signature else None
                 }
                 
                 # 檢查是否已有相同表單編號
@@ -221,6 +295,37 @@ elif choice == "📊 查看所有紀錄":
             filtered_df = df[df["狀態"] == status_filter]
         else:
             filtered_df = df
+        
+        # 快速歸還功能
+        if '狀態' in filtered_df.columns:
+            rental_records = filtered_df[filtered_df['狀態'] == '租借中']
+            if not rental_records.empty:
+                st.markdown("---")
+                st.markdown("### 🔄 快速歸還")
+                st.write("點擊按鈕快速確認物品歸還：")
+                
+                # 創建一個更好的快速歸還界面
+                for idx, row in rental_records.iterrows():
+                    original_idx = filtered_df.index.get_loc(idx)
+                    col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
+                    with col1:
+                        st.write(f"**{row['表單編號']}** - {row['摘要']}")
+                    with col2:
+                        st.write(f"📅 {row['借用日期']}")
+                    with col3:
+                        st.write(f"👤 {row['借用部門主管']}")
+                    with col4:
+                        if st.button(f"🔄 確認歸還", key=f"return_{original_idx}"):
+                            # 找到原始記錄的索引
+                            for i, record in enumerate(st.session_state.records):
+                                if record['表單編號'] == row['表單編號']:
+                                    # 更新狀態和歸還日期
+                                    st.session_state.records[i]['狀態'] = '已歸還'
+                                    st.session_state.records[i]['實際歸還日期'] = date.today().strftime("%Y-%m-%d")
+                                    save_data(st.session_state.records)
+                                    st.success(f"✅ 表單 {row['表單編號']} 已確認歸還！")
+                                    st.rerun()
+                                    break
         
         # 顯示資料表格
         st.dataframe(filtered_df, use_container_width=True)
