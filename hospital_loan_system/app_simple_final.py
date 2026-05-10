@@ -130,13 +130,13 @@ if choice == "📝 新增租借紀錄":
         st.markdown("**👤 借用部門主管**")
         st.markdown("*Borrow Dept. / Ward i/c*")
         st.markdown("*(簽名請用正楷)*")
-        borrow_manager = st.text_input("Name", placeholder="請輸入姓名")
+        borrow_manager = st.text_input("Borrow Manager", placeholder="請輸入姓名")
     
     with col2:
         st.markdown("**👤 借出部門主管**")
         st.markdown("*Loan Dept. / Ward i/c*")
         st.markdown("*(簽名請用正楷)*")
-        loan_manager = st.text_input("Name", placeholder="請輸入姓名")
+        loan_manager = st.text_input("Loan Manager", placeholder="請輸入姓名")
     
     # 提交按鈕
     st.markdown("---")
