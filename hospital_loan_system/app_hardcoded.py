@@ -259,9 +259,8 @@ elif choice == "📊 查看所有紀錄":
                 with col3:
                     st.markdown('<div class="metric-card">✅ 已歸還<br><h3>{}</h3></div>'.format(len(df[df["狀態"] == "已歸還"])), unsafe_allow_html=True)
                 with col4:
-                    st.markdown('<div class="metric-card">📈 歸還率<br><h3>{:.1f}%</h3></div>'.format(
-                        (len(df[df["狀態"] == "已歸還"]) / len(df) * 100 if len(df) > 0 else 0
-                    ), unsafe_allow_html=True)
+                    return_rate = (len(df[df["狀態"] == "已歸還"]) / len(df) * 100 if len(df) > 0 else 0
+                    st.markdown(f'<div class="metric-card">📈 歸還率<br><h3>{return_rate:.1f}%</h3></div>', unsafe_allow_html=True)
                 
                 # 匯出功能
                 st.markdown("---")
