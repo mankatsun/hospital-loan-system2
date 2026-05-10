@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 虛擬環境
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# Google Sheets 認證檔案 (上傳到部署平台時需要重新設定)
+service_account.json
+credentials.json
+
+# Streamlit
+.streamlit/
+
+# 舊版本檔案 (不需要上傳)
+app.py
+app_cloud.py
+app_simple.py
+app_fixed.py
+app_beautiful.py
+app_clean.py
+app_final.py
+app_final_solution.py
+google_sheets_config.py
+test_credentials.py
