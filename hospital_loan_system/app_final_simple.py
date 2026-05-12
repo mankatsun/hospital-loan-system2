@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import date
 import json
 import os
+import streamlit.components.v1 as components
 
 # 設定網頁標題和樣式
 st.set_page_config(
@@ -13,7 +14,6 @@ st.set_page_config(
 
 # 自定義 CSS 樣式
 st.markdown("""
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -142,7 +142,7 @@ if choice == "📝 新增租借紀錄":
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("**🏷️ 物品編號**")
+        st.markdown("**📝 物品編號**")
         item_code = st.text_input("Code No.", placeholder="例: MED-001")
         
         st.markdown("**📊 數量**")
@@ -221,7 +221,7 @@ if choice == "📝 新增租借紀錄":
                 st.error("❌ 請填寫必填欄位：表單編號、領用部門、物品編號、摘要")
 
 elif choice == "📊 查看所有紀錄":
-    st.markdown('<div class="form-section"><h2>📋 租借紀錄總覽</h2></div>', unsafe_allow_html=True)
+    st.markdown('<div class="form-section"><h2><i class="fas fa-clipboard-list"></i> 租借紀錄總覽</h2></div>', unsafe_allow_html=True)
     
     if st.session_state.records:
         df = pd.DataFrame(st.session_state.records)
@@ -238,7 +238,7 @@ elif choice == "📊 查看所有紀錄":
             rental_records = filtered_df[filtered_df['狀態'] == '租借中']
             if not rental_records.empty:
                 st.markdown("---")
-                st.markdown("### 🔄 快速歸還")
+                st.markdown("### <i class=\"fas fa-sync\"></i> 快速歸還")
                 st.write("點擊按鈕快速確認物品歸還：")
                 
                 # 創建一個更好的快速歸還界面
@@ -248,11 +248,11 @@ elif choice == "📊 查看所有紀錄":
                     with col1:
                         st.write(f"**{row['表單編號']}** - {row['摘要']}")
                     with col2:
-                        st.write(f"📅 {row['借用日期']}")
+                        st.write(f"<i class=\"fas fa-calendar-alt\"></i> {row['借用日期']}")
                     with col3:
-                        st.write(f"👤 {row['借用部門主管']}")
+                        st.write(f"<i class=\"fas fa-user\"></i> {row['借用部門主管']}")
                     with col4:
-                        if st.button(f"🔄 確認歸還", key=f"return_{original_idx}"):
+                        if st.button(f"<i class=\"fas fa-sync\"></i> 確認歸還", key=f"return_{original_idx}"):
                             # 找到原始記錄的索引
                             for i, record in enumerate(st.session_state.records):
                                 if record['表單編號'] == row['表單編號']:
@@ -270,18 +270,18 @@ elif choice == "📊 查看所有紀錄":
         # 統計卡片
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.markdown('<div class="metric-card">📊 總紀錄數<br><h3>{}</h3></div>'.format(len(df)), unsafe_allow_html=True)
+            st.markdown('<div class="metric-card"><i class="fas fa-chart-bar"></i> 總紀錄數<br><h3>{}</h3></div>'.format(len(df)), unsafe_allow_html=True)
         with col2:
-            st.markdown('<div class="metric-card">🔄 租借中<br><h3>{}</h3></div>'.format(len(df[df["狀態"] == "租借中"])), unsafe_allow_html=True)
+            st.markdown('<div class="metric-card"><i class="fas fa-sync"></i> 租借中<br><h3>{}</h3></div>'.format(len(df[df["狀態"] == "租借中"])), unsafe_allow_html=True)
         with col3:
-            st.markdown('<div class="metric-card">✅ 已歸還<br><h3>{}</h3></div>'.format(len(df[df["狀態"] == "已歸還"])), unsafe_allow_html=True)
+            st.markdown('<div class="metric-card"><i class="fas fa-check"></i> 已歸還<br><h3>{}</h3></div>'.format(len(df[df["狀態"] == "已歸還"])), unsafe_allow_html=True)
         with col4:
             return_rate = (len(df[df["狀態"] == "已歸還"]) / len(df) * 100 if len(df) > 0 else 0)
-            st.markdown(f'<div class="metric-card">📈 歸還率<br><h3>{return_rate:.1f}%</h3></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><i class="fas fa-chart-line"></i> 歸還率<br><h3>{return_rate:.1f}%</h3></div>', unsafe_allow_html=True)
         
         # 狀態更新功能
         st.markdown("---")
-        st.markdown("### 🔄 更新紀錄狀態")
+        st.markdown("### <i class=\"fas fa-sync\"></i> 更新紀錄狀態")
         
         if not filtered_df.empty:
             selected_record = st.selectbox(
@@ -294,7 +294,7 @@ elif choice == "📊 查看所有紀錄":
             with col1:
                 new_status = st.selectbox("新狀態", ["租借中", "已歸還"])
             with col2:
-                if st.button("🔄 更新狀態"):
+                if st.button("<i class=\"fas fa-sync\"></i> 更新狀態"):
                     st.session_state.records[selected_record]["狀態"] = new_status
                     save_data(st.session_state.records)
                     st.success("✅ 狀態已更新！")
@@ -304,7 +304,7 @@ elif choice == "📊 查看所有紀錄":
         st.markdown("---")
         csv = filtered_df.to_csv(index=False).encode('utf-8-sig')
         st.download_button(
-            label="📥 下載紀錄 (CSV)",
+            label="<i class=\"fas fa-download\"></i> 下載紀錄 (CSV)",
             data=csv,
             file_name=f"hospital_loan_records_{date.today().strftime('%Y%m%d')}.csv",
             mime="text/csv",
@@ -312,30 +312,30 @@ elif choice == "📊 查看所有紀錄":
     else:
         st.info("📝 目前尚無任何紀錄。")
 
-elif choice == "📈 數據統計":
-    st.markdown('<div class="form-section"><h2>📈 數據統計分析</h2></div>', unsafe_allow_html=True)
+elif choice == "<i class=\"fas fa-chart-line\"></i> 數據統計":
+    st.markdown('<div class="form-section"><h2><i class="fas fa-chart-line"></i> 數據統計分析</h2></div>', unsafe_allow_html=True)
     
     if st.session_state.records:
         df = pd.DataFrame(st.session_state.records)
         
         # 部門統計
         dept_stats = df['領用部門'].value_counts()
-        st.markdown("### 🏢 領用部門統計")
+        st.markdown("### <i class=\"fas fa-building\"></i> 領用部門統計")
         st.bar_chart(dept_stats)
         
         # 物品統計
         item_stats = df['物品編號'].value_counts()
-        st.markdown("### 📦 物品借用排行")
+        st.markdown("### <i class=\"fas fa-box\"></i> 物品借用排行")
         st.bar_chart(item_stats.head(10))
         
         # 時間趨勢
         df['日期'] = pd.to_datetime(df['日期'])
         monthly_stats = df.groupby(df['日期'].dt.to_period('M')).size()
-        st.markdown("### 📅 月度借用趨勢")
+        st.markdown("### <i class=\"fas fa-calendar-alt\"></i> 月度借用趨勢")
         st.line_chart(monthly_stats)
         
         # 詳細統計表格
-        st.markdown("### 📊 詳細統計")
+        st.markdown("### <i class=\"fas fa-chart-bar\"></i> 詳細統計")
         col1, col2 = st.columns(2)
         with col1:
             st.write("**部門借用統計**")
@@ -353,37 +353,37 @@ elif choice == "📈 數據統計":
             })
             st.dataframe(item_table, use_container_width=True)
     else:
-        st.info("📝 目前尚無任何紀錄。")
+        st.info("<i class=\"fas fa-edit\"></i> 目前尚無任何紀錄。")
 
-elif choice == "⚙️ 系統設定":
-    st.markdown('<div class="form-section"><h2>⚙️ 系統設定</h2></div>', unsafe_allow_html=True)
+elif choice == "<i class=\"fas fa-cog\"></i> 系統設定":
+    st.markdown('<div class="form-section"><h2><i class="fas fa-cog"></i> 系統設定</h2></div>', unsafe_allow_html=True)
     
     # 連接狀態
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### 🔗 系統狀態")
-        st.success("✅ 本地系統運行正常")
-        st.metric("📊 總資料數", len(st.session_state.records))
+        st.markdown("### <i class=\"fas fa-link\"></i> 系統狀態")
+        st.success("<i class=\"fas fa-check\"></i> 本地系統運行正常")
+        st.metric("<i class=\"fas fa-chart-bar\"></i> 總資料數", len(st.session_state.records))
         
         # 檢查資料檔案
         if os.path.exists('hospital_loan_data.json'):
-            st.success("✅ 資料檔案存在")
+            st.success("<i class=\"fas fa-check\"></i> 資料檔案存在")
             file_size = os.path.getsize('hospital_loan_data.json')
-            st.metric("📁 檔案大小", f"{file_size} bytes")
+            st.metric("<i class=\"fas fa-folder\"></i> 檔案大小", f"{file_size} bytes")
         else:
             st.warning("⚠️ 資料檔案不存在")
     
     with col2:
-        st.markdown("### 💾 資料持久化")
-        st.info("ℹ️ 本地檔案儲存")
+        st.markdown("### <i class=\"fas fa-database\"></i> 資料持久化")
+        st.info("<i class=\"fas fa-info-circle\"></i> 本地檔案儲存")
         st.write("🔐 資料儲存於 `hospital_loan_data.json`")
         st.write("🔄 自動保存所有操作")
         st.write("📱 支援多裝置同步")
-        st.write("☁️ 簡化版本 - 無簽名")
+        st.write("<i class=\"fas fa-cloud\"></i> 簡化版本 - 無簽名")
     
     # 資料管理
     st.markdown("---")
-    st.markdown("### 🗂️ 資料管理")
+    st.markdown("### <i class=\"fas fa-folder-open\"></i> 資料管理")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -428,21 +428,13 @@ elif choice == "⚙️ 系統設定":
     if uploaded_file is not None:
         try:
             backup_data = json.loads(uploaded_file.read().decode('utf-8'))
-            if st.button("🔄 還原備份"):
+            if st.button("<i class=\"fas fa-sync\"></i> 還原備份"):
                 st.session_state.records = backup_data
                 save_data(backup_data)
                 st.success("✅ 備份已還原")
                 st.rerun()
         except Exception as e:
             st.error(f"❌ 還原失敗：{str(e)}")
-
-# 側邊欄資訊
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 📊 系統資訊")
-st.sidebar.metric("🔄 租借中", len([r for r in st.session_state.records if r.get('狀態') == '租借中']))
-st.sidebar.metric("📊 總紀錄", len(st.session_state.records))
-
-# 檢查資料檔案狀態
 if os.path.exists('hospital_loan_data.json'):
     st.sidebar.success("✅ 資料已持久化")
 else:
@@ -450,19 +442,9 @@ else:
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 💡 使用提示")
-st.sidebar.write("• 資料自動保存到本地檔案")
-st.sidebar.write("• 刷新網頁不會遺失資料")
-st.sidebar.write("• 支援備份與還原")
-st.sidebar.write("• 可隨時匯出資料")
-st.sidebar.write("• 手機友好界面")
-st.sidebar.write("• 簡化版本 - 無簽名")
-
-# 頁腳
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #667eea; padding: 2rem;'>
-    <p>🏥 醫院物品租借管理系統 v12.0</p>
-    <p>💡 最終簡化版本 - 無電子簽名</p>
-    <p>🌐 基於 Streamlit 的解決方案</p>
-</div>
-""", unsafe_allow_html=True)
+st.sidebar.write("• 🔄 資料自動保存到本地檔案")
+st.sidebar.write("• 🔄 刷新網頁不會遺失資料")
+st.sidebar.write("• 📦 支援備份與還原")
+st.sidebar.write("• 📥 可隨時匯出資料")
+st.sidebar.write("• 📥 可隨時匯出資料")
+st.sidebar.write("• 💾 資料自動保存到本地檔案")
