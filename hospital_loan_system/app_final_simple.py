@@ -13,6 +13,7 @@ st.set_page_config(
 
 # 自定義 CSS 樣式
 st.markdown("""
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
