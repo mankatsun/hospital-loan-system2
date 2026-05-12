@@ -458,3 +458,11 @@ st.sidebar.write("• 手機友好界面")
 st.sidebar.write("• 簡化版本 - 無簽名")
 
 # 頁腳
+st.markdown("---")
+st.markdown("""
+<div style='text-align: center; color: #667eea; padding: 2rem;'>
+    <p>🏥 醫院物品租借管理系統 v12.0</p>
+    <p>💡 最終簡化版本 - 無電子簽名</p>
+    <p>🌐 基於 Streamlit 的解決方案</p>
+</div>
+""", unsafe_allow_html=True)
