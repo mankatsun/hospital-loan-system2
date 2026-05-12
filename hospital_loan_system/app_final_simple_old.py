@@ -456,3 +456,6 @@ st.sidebar.write("• 可隨時匯出資料")
 st.sidebar.write("• 手機友好界面")
 st.sidebar.write("• 簡化版本 - 無簽名")
 
+# 頁腳
+
+""", unsafe_allow_html=True)
